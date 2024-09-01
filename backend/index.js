@@ -49,8 +49,14 @@ async function connectToDatabase() {
     await pool.request().query(createTableQuery);
     console.log("Checked for table existence and created if it did not exist.");
     await pool.close();
+
+    // Start the server only after successful database connection
+    app.listen(port, "0.0.0.0", () => {
+      console.log(`Backend listening at http://0.0.0.0:${port}`);
+    });
   } catch (err) {
     console.error("Error connecting to SQL Server:", err);
+    process.exit(1); // Exit the process with an error code
   }
 }
 
@@ -90,8 +96,4 @@ app.post("/insert", async (req, res) => {
     console.error("Error inserting data:", err);
     res.status(500).send("Error inserting data into the database");
   }
-});
-
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Backend listening at http://0.0.0.0:${port}`);
 });
